@@ -76,6 +76,10 @@ export default function ChatPanel({
         const data = (await res.json()) as { messages: ChatMessage[] };
         setMessages((prev) => {
           if (sameMessages(prev, data.messages)) return prev;
+          // Messages only ever grow or get trimmed from the oldest end —
+          // a sudden drop while we already have messages means this read
+          // hit a stale/partial copy, not a real change. Keep what we have.
+          if (data.messages.length < prev.length && prev.length > 0) return prev;
           if (isNearBottomRef.current) requestAnimationFrame(scrollToBottom);
           return data.messages;
         });
@@ -133,8 +137,8 @@ export default function ChatPanel({
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-12 font-body text-plum">
-      <header className="mb-6">
+    <main className="mx-auto flex h-screen max-w-2xl flex-col px-6 py-6 font-body text-plum">
+      <header className="mb-4 flex-none">
         <h1 className="font-display text-2xl text-plum">{siteContent.chat.heading}</h1>
         <p className="mt-2 text-sm text-plum/70">{siteContent.chat.intro}</p>
         {!blobConfigured && (
@@ -149,7 +153,7 @@ export default function ChatPanel({
       <div
         ref={listRef}
         onScroll={handleScroll}
-        className="flex-1 space-y-3 overflow-y-auto rounded-2xl bg-white/50 p-4 shadow-sm backdrop-blur-sm"
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto rounded-2xl bg-white/50 p-4 shadow-sm backdrop-blur-sm"
       >
         {messages.length === 0 && (
           <p className="text-sm text-plum/50">No messages yet — say hi!</p>
@@ -177,9 +181,9 @@ export default function ChatPanel({
         <div ref={bottomRef} />
       </div>
 
-      {error && <p className="mt-2 text-sm text-rose-deep">{error}</p>}
+      {error && <p className="mt-2 flex-none text-sm text-rose-deep">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-3">
+      <form onSubmit={handleSubmit} className="mt-4 flex flex-none items-center gap-3">
         <input
           type="text"
           value={draft}

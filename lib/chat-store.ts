@@ -65,6 +65,11 @@ export async function appendMessage(sender: ChatSender, text: string): Promise<S
       contentType: "application/json",
       addRandomSuffix: false,
       allowOverwrite: true,
+      // Public blobs are cached at the edge for a month by default, and
+      // get()'s useCache:false only applies to private blobs — so without
+      // this, pollers can keep reading a stale (sometimes near-empty)
+      // cached copy of the chat for a long time after new messages land.
+      cacheControlMaxAge: 0,
     });
   } catch (err) {
     if (isBlobUnconfiguredError(err)) {
