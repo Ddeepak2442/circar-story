@@ -40,6 +40,17 @@ Changes save immediately to Blob storage and show up on the public page right aw
 
 **This admin page has no username/password — the secret URL is the only thing protecting it.** Don't share that link, and treat it like a password. To change it, update `ADMIN_SECRET` in `.env.local` (local) and in your Vercel project's Environment Variables (production), then use the new URL.
 
+### Private chat — just the two of you
+
+There's also a simple private chat at `/chat/<your secret>`, using the same `ADMIN_SECRET` as the admin page — no extra setup needed. Use a different link for each of you:
+
+- Yours: `/chat/<your secret>?as=me`
+- Hers: `/chat/<your secret>?as=her`
+
+Messages save to Blob storage and auto-refresh every few seconds, so you don't need to reload — just keep the tab open. The last ~300 messages are kept; older ones are trimmed automatically.
+
+**Same security model as the admin page: no login, just the secret URL.** Don't share either link, and don't send anything you wouldn't want to lose — there's no message editing or deleting, and like the admin page, this trades strong security for simplicity.
+
 ### Changing the color theme
 
 The pastel palette (blush pink, lilac, cream, rose, gold) is defined at the top of [`app/globals.css`](./app/globals.css) as CSS variables (`--blush`, `--lilac`, `--rose`, etc.) — tweak the hex values there to shift the whole site's palette.
@@ -54,7 +65,7 @@ This site needs two things set up on [Vercel](https://vercel.com) (made by the N
 2. **Add a Blob store** (for the admin page to work): in the Vercel dashboard, open your project → **Storage** tab → **Create Database** → **Blob** → connect it to this project. Vercel automatically sets a `BLOB_READ_WRITE_TOKEN` environment variable for you — no copying/pasting needed.
 3. **Set your admin secret:** in the project's **Settings → Environment Variables**, add `ADMIN_SECRET` with your own value (reuse the one in `.env.local`, or pick a new random string).
 4. **Redeploy** (Vercel does this automatically after step 2/3 change env vars in most cases; if not, trigger a redeploy from the dashboard).
-5. Your site is live at `your-project.vercel.app` — send that link to her. Your admin page is `your-project.vercel.app/admin/<ADMIN_SECRET>` — keep that one to yourself.
+5. Your site is live at `your-project.vercel.app` — send that link to her. Your admin page is `your-project.vercel.app/admin/<ADMIN_SECRET>` — keep that one to yourself. The chat links are `your-project.vercel.app/chat/<ADMIN_SECRET>?as=me` (yours) and `?as=her` (hers).
 
 Other hosts (Netlify, Cloudflare Pages, etc.) can run the Next.js app itself, but the admin page's storage is built specifically on Vercel Blob, so Vercel is the path of least resistance here.
 

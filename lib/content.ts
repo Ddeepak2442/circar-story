@@ -90,4 +90,12 @@ export const siteContent = {
   footer: {
     line: "Made with love, just for you.",
   },
+
+  // The private two-person chat at /chat/<ADMIN_SECRET>.
+  chat: {
+    heading: "Just us",
+    intro: "A little private corner, just for the two of us.",
+    // Shown as the sender label on her link for messages sent from your link.
+    meLabel: "Me",
+  },
 };
